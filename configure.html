@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Configurar Feedback Coach AI</title>
+  <script src="https://res.cdn.office.net/teams-js/2.40.0/js/MicrosoftTeams.min.js"></script>
+  <style>body{font-family:Segoe UI,Arial,sans-serif;margin:0;padding:24px;color:#15251d;background:#f3f6f4}.card{max-width:560px;background:white;border:1px solid #d8e2dc;border-radius:14px;padding:20px}h2{margin-top:0}.ok{color:#2f7a4c;font-weight:700}</style>
+</head>
+<body>
+  <div class="card">
+    <h2>Feedback Coach AI</h2>
+    <p class="ok">La aplicación está lista para agregarse a esta reunión.</p>
+    <p>Selecciona <b>Guardar</b> en Teams para continuar.</p>
+  </div>
+  <script>
+    (async function(){
+      try {
+        await microsoftTeams.app.initialize();
+        const base = new URL('.', window.location.href).href.replace(/\/$/, '');
+        microsoftTeams.pages.config.registerOnSaveHandler(async function(saveEvent){
+          try {
+            await microsoftTeams.pages.config.setConfig({
+              websiteUrl: base + '/index.html',
+              contentUrl: base + '/index.html',
+              entityId: 'feedback-coach-ai',
+              suggestedDisplayName: 'Feedback Coach AI'
+            });
+            saveEvent.notifySuccess();
+          } catch (e) {
+            saveEvent.notifyFailure('No se pudo configurar Feedback Coach AI.');
+          }
+        });
+        microsoftTeams.pages.config.setValidityState(true);
+      } catch (e) {
+        document.body.insertAdjacentHTML('beforeend','<p>No se pudo iniciar TeamsJS. Abre esta página desde Microsoft Teams.</p>');
+      }
+    })();
+  </script>
+</body>
+</html>
