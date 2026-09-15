@@ -15,7 +15,7 @@
   <div class="sideBottom"><small>Vista simulada por rol</small><select id="role"><option>Admin</option><option>Advisor</option><option>Líder de Servicio</option><option>Colaborador</option></select></div>
 </aside>
 <main class="main">
-<header class="top"><div><h2 id="title">Dashboard</h2><p id="subtitle"></p></div><div style="display:flex;gap:8px;align-items:center"><span class="demoTag">Piloto interno</span><span class="pill">● Datos piloto</span></div></header>
+<header class="top"><div><h2 id="title">Dashboard</h2><p id="subtitle"></p></div><div class="topActions"><span id="teamsContextPill" class="pill hidden"></span><button id="shareStageBtn" class="btn agent sm hidden" type="button">Compartir en escenario</button><span class="demoTag">Piloto interno</span><span class="pill">● Datos piloto</span></div></header>
 <section class="content" id="view"></section>
 </main>
 </div></div>
@@ -34,14 +34,68 @@
       }
     }
 
+    function labelForContext(frameContext) {
+      const labels = {
+        personalTab: 'Teams · Personal',
+        channelTab: 'Teams · Canal',
+        privateChatTab: 'Teams · Chat grupal',
+        meetingChatTab: 'Teams · Chat de reunión',
+        meetingDetailsTab: 'Teams · Detalles de reunión',
+        meetingSidePanel: 'Teams · Panel de reunión',
+        meetingStage: 'Teams · Escenario'
+      };
+      return labels[frameContext] || 'Microsoft Teams';
+    }
+
+    async function shareToMeetingStage() {
+      const btn = document.getElementById('shareStageBtn');
+      if (!window.microsoftTeams || !microsoftTeams.meeting) return;
+      const appContentUrl = new URL('./index.html?stage=1', window.location.href).href;
+      btn.disabled = true;
+      const oldText = btn.textContent;
+      btn.textContent = 'Compartiendo…';
+      try {
+        await new Promise(function(resolve, reject) {
+          microsoftTeams.meeting.shareAppContentToStage(function(err, result) {
+            if (err) reject(err);
+            else if (result) resolve(result);
+            else reject(new Error('Teams no confirmó el uso compartido al escenario.'));
+          }, appContentUrl);
+        });
+        btn.textContent = 'Compartido ✓';
+        setTimeout(function(){ btn.textContent = oldText; btn.disabled = false; }, 2200);
+      } catch (e) {
+        console.error('Share to stage failed', e);
+        btn.textContent = 'Reintentar compartir';
+        btn.disabled = false;
+        alert('No se pudo compartir al escenario. Verifica que estés dentro de una reunión activa y que la app tenga el permiso MeetingStage.Write.Chat.');
+      }
+    }
+
     window.__teamsReady = detectTeams();
     window.__teamsReady.then(function(ctx) {
       const frameContext = ctx && ctx.page ? (ctx.page.frameContext || '') : '';
       const meetingId = ctx && ctx.meeting ? (ctx.meeting.id || '') : '';
+      window.__teamsContext = ctx || null;
+
+      const contextPill = document.getElementById('teamsContextPill');
+      const shareBtn = document.getElementById('shareStageBtn');
+      if (ctx && contextPill) {
+        contextPill.textContent = labelForContext(frameContext);
+        contextPill.classList.remove('hidden');
+      }
+      if (ctx && frameContext === 'meetingSidePanel' && shareBtn) {
+        shareBtn.classList.remove('hidden');
+        shareBtn.addEventListener('click', shareToMeetingStage);
+      }
+
       mountFeedbackCoach(document.getElementById('fc-root'), {
         isTeams: !!ctx,
         frameContext: frameContext,
-        meetingId: meetingId
+        meetingId: meetingId,
+        teamId: ctx && ctx.team ? (ctx.team.groupId || '') : '',
+        channelId: ctx && ctx.channel ? (ctx.channel.id || '') : '',
+        chatId: ctx && ctx.chat ? (ctx.chat.id || '') : ''
       });
     });
   </script>

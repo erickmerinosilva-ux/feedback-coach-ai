@@ -10,30 +10,46 @@
 <body>
   <div class="card">
     <h2>Feedback Coach AI</h2>
-    <p class="ok">La aplicación está lista para agregarse a esta reunión.</p>
-    <p>Selecciona <b>Guardar</b> en Teams para continuar.</p>
+    <p class="ok" id="readyText">La aplicación está lista para agregarse.</p>
+    <p id="contextText">Selecciona <b>Guardar</b> en Teams para continuar.</p>
   </div>
   <script>
     (async function(){
       try {
         await microsoftTeams.app.initialize();
+        const ctx = await microsoftTeams.app.getContext();
+        const fc = ctx && ctx.page ? (ctx.page.frameContext || '') : '';
+        const labels = {
+          channelTab: 'este canal',
+          privateChatTab: 'este chat grupal',
+          meetingChatTab: 'el chat de esta reunión',
+          meetingDetailsTab: 'esta reunión',
+          meetingSidePanel: 'el panel de esta reunión',
+          meetingStage: 'el escenario de esta reunión'
+        };
+        document.getElementById('readyText').textContent = 'Feedback Coach AI está listo para agregarse a ' + (labels[fc] || 'Teams') + '.';
         const base = new URL('.', window.location.href).href.replace(/\/$/, '');
+        const entityId = 'feedback-coach-ai-' + (ctx && ctx.page && ctx.page.id ? ctx.page.id : Date.now());
+
         microsoftTeams.pages.config.registerOnSaveHandler(async function(saveEvent){
           try {
             await microsoftTeams.pages.config.setConfig({
               websiteUrl: base + '/index.html',
               contentUrl: base + '/index.html',
-              entityId: 'feedback-coach-ai',
+              entityId: entityId,
               suggestedDisplayName: 'Feedback Coach AI'
             });
             saveEvent.notifySuccess();
           } catch (e) {
+            console.error('Teams setConfig failed', e);
             saveEvent.notifyFailure('No se pudo configurar Feedback Coach AI.');
           }
         });
         microsoftTeams.pages.config.setValidityState(true);
       } catch (e) {
-        document.body.insertAdjacentHTML('beforeend','<p>No se pudo iniciar TeamsJS. Abre esta página desde Microsoft Teams.</p>');
+        console.error('Teams initialization failed', e);
+        document.getElementById('readyText').textContent = 'No se pudo iniciar la integración con Microsoft Teams.';
+        document.getElementById('contextText').textContent = 'Cierra esta ventana y vuelve a abrir la configuración desde Teams.';
       }
     })();
   </script>
