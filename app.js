@@ -6,7 +6,7 @@ function mountFeedbackCoach(root, options = {}) {
   if (options.meetingId) root.dataset.meetingId = options.meetingId;
 
   const KEY='feedback_coach_ai_final_v4';
-  const FEEDBACK_API='https://axet.nttdata.com/flows/cloud/27153-v2/feedback-coach/live';
+  const FEEDBACK_API='https://axet.nttdata.com/flows/cloud/27153-v3/feedback-coach/live';
   const NAV=[
    ['dashboard','◆','Dashboard'],['live','●','Sesión en vivo','IA'],['feedback','✎','Feedback'],['om','◔','Oportunidades de Mejora'],['challenges','▣','Desafíos'],['follow','↻','Seguimiento Advisor'],['people','☰','Directorio'],['settings','⚙','Configuración']
   ];
