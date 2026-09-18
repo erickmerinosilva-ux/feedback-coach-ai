@@ -36,3 +36,6 @@ button,input,select,textarea{font:inherit}.app{display:grid;grid-template-column
 .fc-root[data-teams-context="meetingDetailsTab"] .top,
 .fc-root[data-teams-context="privateChatTab"] .top{position:relative}
 @media(max-width:760px){.topActions .demoTag{display:none}.topActions{gap:5px}.topActions .pill{font-size:10px;padding:4px 7px}}
+
+/* Release 4 production UI */
+.sideBottom .mini{color:#fff}

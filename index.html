@@ -12,10 +12,10 @@
 <aside class="side">
   <div class="brand"><div class="logo">FC</div><div><h1>Feedback Coach AI</h1><small>Bitácora de Talento</small></div></div>
   <div class="nav" id="nav"></div>
-  <div class="sideBottom"><small>Vista simulada por rol</small><select id="role"><option>Admin</option><option>Advisor</option><option>Líder de Servicio</option><option>Colaborador</option></select></div>
+  <div class="sideBottom"><small>Sesión actual</small><div id="signedUser" class="mini">Usuario de Teams</div><div class="mini" style="opacity:.65;margin-top:4px">Feedback Coach AI</div></div>
 </aside>
 <main class="main">
-<header class="top"><div><h2 id="title">Dashboard</h2><p id="subtitle"></p></div><div class="topActions"><span id="teamsContextPill" class="pill hidden"></span><button id="shareStageBtn" class="btn agent sm hidden" type="button">Compartir en escenario</button><span class="demoTag">Piloto interno</span><span class="pill">● Datos piloto</span></div></header>
+<header class="top"><div><h2 id="title">Dashboard</h2><p id="subtitle"></p></div><div class="topActions"><span id="teamsContextPill" class="pill hidden"></span><button id="shareStageBtn" class="btn agent sm hidden" type="button">Compartir en escenario</button></div></header>
 <section class="content" id="view"></section>
 </main>
 </div></div>
@@ -95,7 +95,8 @@
         meetingId: meetingId,
         teamId: ctx && ctx.team ? (ctx.team.groupId || '') : '',
         channelId: ctx && ctx.channel ? (ctx.channel.id || '') : '',
-        chatId: ctx && ctx.chat ? (ctx.chat.id || '') : ''
+        chatId: ctx && ctx.chat ? (ctx.chat.id || '') : '',
+        userName: ctx && ctx.user ? (ctx.user.displayName || ctx.user.userPrincipalName || '') : ''
       });
     });
   </script>
